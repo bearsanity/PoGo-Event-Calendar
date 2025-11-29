@@ -4,12 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>PoGo Event Calender</title>
+    <title>PoGo Event Calendar</title>
 
 </head>
 <body>
+    <header>
+        <nav class = "navbar">
+            <ul class = 'navbar-links'>
+                <li href = ''>placehold</li> <!-- not sure these will be needed -->
+                <li href = ''>placehold</li>
+                <li href = ''>Contact</li>
+            </ul>
+                        <!-- Search section -->
+            <form id="search-section">
+                <input id="city-input" type="text" placeholder="Enter or change your city">
+                <button id="update-button" type = "button">Update</button>
+            </form>
+        </nav>
+    </header>
 
+    <!-- Main layout:  -->
+    <main id="layout-container">
 
+        <!-- Title/Logo + displaying city section -->
+        <section id="calendar-title">
+            <p id="current-city-label">
+                Displaying weather for:
+                <span id="current-city">None selected</span> 
+            </p>
+        </section>
+
+        <!-- Calendar to be done in javascript-->
+        <section id="calendar"></section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js'></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="assets/script.js"></script>
 </body>

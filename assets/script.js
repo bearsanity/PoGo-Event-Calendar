@@ -1,8 +1,6 @@
- $(() => {
+ $(() => { //jquery reads this as the same way as document.addEventListener('DOMContentLoaded', () => {
   "use strict";
 
-
- 
 //Testing to see if scraped duck works
  
 //  const url = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json";
@@ -21,5 +19,16 @@
 
 //   testScrapedDuck();
 
+    const updateButton = $('#update-button');
+    const cityInput = $('#city-input');
 
+ //Calendar from FullCalendar
+
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth'
+    });
+    
+    calendar.render();
+      
 });
