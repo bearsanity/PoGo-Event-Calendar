@@ -25,11 +25,17 @@
     //Scrapped duck API link
     const duckUrl = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json";
 
-    //Calls scrapped duck API to get raw event data then transforms it into an array that the Calendar can read
-    async function getScrappedDuckEvents() {
+    //Calls the scraped duck api to get all the event data in raw form
+    async function getRawEvents() {
         const response = await fetch(duckUrl);
         const rawEvents = await response.json();
-        console.log("All Events:", rawEvents);
+        console.log('All events:', rawEvents);
+        return rawEvents;
+    };
+    
+    //Calls scrapped duck API to get raw event data then transforms it into an array that the Calendar can read
+    async function getScrappedDuckEvents() {
+        const rawEvents = await getRawEvents();
 
         //This maps the raw data to an array the Calender can read
         const calenderEvents = rawEvents.map(event =>({
@@ -37,10 +43,20 @@
             start: event.start,
             end: event.end,
             url: event.link,
-        }))
+        }));
 
         return calenderEvents;
-        };
+    };
+
+    //Gets an array of all the unique event types to be used with the calendar event display toggles
+    async function getUniqueEventTypes() {
+        const rawEvents = await getRawEvents();
+        const eventTypes = rawEvents.map(event => event.eventType);
+        const uniqueEventTypes = new Set(eventTypes);
+        const uniqueEventTypesArray = [...uniqueEventTypes];
+
+        return uniqueEventTypesArray; 
+    };
    
    
     //Creates the card for current weather
