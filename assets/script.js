@@ -16,19 +16,7 @@
 
     const updateButton = $('#update-button');
     const cityInput = $('#city-input');
-
-    //--------------------------
-    //Calendar from FullCalendar
-    //--------------------------
-
     var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        events: 
-
-    });
-    
-    calendar.render();
 
     //----------------
     //Helper functions
@@ -53,8 +41,6 @@
 
         return calenderEvents;
         };
-
-        console.log(getScrappedDuckEvents());
    
    
     //Creates the card for current weather
@@ -87,6 +73,23 @@
             localStorage.setItem('history', JSON.stringify(history));
         }
     };
+
+
+    //--------------------------
+    //Calendar from FullCalendar
+    //--------------------------
+
+    async function renderCalendar(){
+        const events = await getScrappedDuckEvents();
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: events
+        });
+        
+        calendar.render();
+        };
+
+    renderCalendar();
 
     //---------------
     //Event listeners
