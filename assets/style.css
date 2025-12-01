@@ -1,3 +1,5 @@
+/*Note to self - rem means root element, so size is using that as a reference. Makes it easier to keep things consistent
+
 /* =======================
    CSS Reset + Base Styles
    ======================= */
@@ -93,10 +95,119 @@ header {
 }
 
 #update-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Give the button that lift appearance when you hover over it*/
     box-shadow: 0 6px 20px rgba(255, 202, 40, 0.5);
 }
 
 #update-button:active {
     transform: translateY(0);
+}
+
+/* ========================
+   Main Layout
+   ======================== */
+#layout-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+/* ========================
+   Calendar Title Section
+   ======================== */
+#calendar-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#current-city-label {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#current-city {
+    color: #ffca28;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* ================
+   Calendar Styling
+   ================*/
+#calendar {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* FullCalendar Overrides */
+.fc {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.fc-toolbar-title {
+    color: #1a237e !important;
+    font-weight: 700;
+}
+
+.fc-button-primary {
+    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.fc-button-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.4) !important;
+}
+
+.fc-button-primary:disabled {
+    opacity: 0.6 !important;
+}
+
+.fc-button-active {
+    background: linear-gradient(135deg, #ffca28 0%, #ff9800 100%) !important;
+    color: #1a1a2e !important;
+}
+
+.fc-daygrid-day {
+    transition: background 0.2s ease;
+}
+
+.fc-daygrid-day:hover {
+    background: rgba(26, 35, 126, 0.08) !important;
+}
+
+.fc-day-today {
+    background: rgba(255, 202, 40, 0.15) !important;
+}
+
+.fc-daygrid-day-number {
+    color: #1a237e;
+    font-weight: 500;
+}
+
+.fc-col-header-cell-cushion {
+    color: #1a237e;
+    font-weight: 600;
+}
+
+/* Event Styling */
+.fc-event {
+    border-radius: 6px !important;
+    border: none !important;
+    padding: 2px 6px !important;
+    font-size: 0.85rem !important;
+}
+
+.fc-daygrid-event {
+    background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%) !important;
+}
+
+.fc-daygrid-event:hover {
+    background: linear-gradient(135deg, #f06292 0%, #e91e63 100%) !important;
 }

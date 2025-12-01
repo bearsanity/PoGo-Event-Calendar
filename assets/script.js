@@ -83,7 +83,8 @@
         const events = await getScrappedDuckEvents();
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            events: events
+            events: events,
+            themeSystem: 'bootstrap5'
         });
         
         calendar.render();
