@@ -27,17 +27,23 @@
 
     //Calls the scraped duck api to get all the event data in raw form
     async function getRawEvents() {
-        const response = await fetch(duckUrl);
+        try {
+            const response = await fetch(duckUrl);
+            if (!response.ok) {
+                throw new Error('Invalid response from server');
+            }
         const rawEvents = await response.json();
         console.log('All events:', rawEvents);
         return rawEvents;
+        
+        } catch(err) {            
+            alert('There was an getting the events.');
+            console.error(err);
+        };
     };
     
-    //Calls scrapped duck API to get raw event data then transforms it into an array that the Calendar can read
-    async function getScrappedDuckEvents() {
-        const rawEvents = await getRawEvents();
-
-        //This maps the raw data to an array the Calender can read
+    // This maps the raw data to an array the Calender can read
+    function getScrapedDuckEvents(rawEvents) {
         const calenderEvents = rawEvents.map(event =>({
             title: event.name,
             start: event.start,
@@ -49,8 +55,7 @@
     };
 
     //Gets an array of all the unique event types to be used with the calendar event display toggles
-    async function getUniqueEventTypes() {
-        const rawEvents = await getRawEvents();
+    function getUniqueEventTypes(rawEvents) {
         const eventTypes = rawEvents.map(event => event.eventType);
         const uniqueEventTypes = new Set(eventTypes);
         const uniqueEventTypesArray = [...uniqueEventTypes];
@@ -73,7 +78,9 @@
         const icon = current.weather[0].icon; //gives the icon code
     };
 
-    
+    function toggleEventDisplay(){
+
+    };
     //--------------
     //Main Functions
     //--------------
@@ -91,12 +98,9 @@
     };
 
 
-    //--------------------------
+  
     //Calendar from FullCalendar
-    //--------------------------
-
-    async function renderCalendar(){
-        const events = await getScrappedDuckEvents();
+    function renderCalendar(events){
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             events: events,
@@ -104,9 +108,38 @@
         });
         
         calendar.render();
-        };
+    };
 
-    renderCalendar();
+    function renderToggleBox(uniqueEvents){
+        const container = $('#toggle-box');
+        container.empty();
+        uniqueEvents.forEach(event =>{
+            const toggle = $('<input>')
+                .attr('type', 'checkbox')
+                .addClass('event-toggle')
+                .attr('id',`${event}`)
+                .on('click', () => {
+                    toggleEventDisplay(event);
+                });
+            const label = $('<label>')
+                .text(event)
+                .attr('for',`${event}`);
+            container.append(toggle);
+            container.append(label);
+        })
+    };
+
+    //Feeds the api info into the render functions then calls them
+    async function initializeApp() {    
+        const rawEvents = await getRawEvents();        
+        const events = getScrapedDuckEvents(rawEvents);
+        const uniqueEvents = getUniqueEventTypes(rawEvents);
+
+        renderCalendar(events);
+        renderToggleBox(uniqueEvents);
+    };
+
+    initializeApp();
 
     //---------------
     //Event listeners
