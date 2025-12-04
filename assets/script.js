@@ -17,10 +17,14 @@
     const updateButton = $('#update-button');
     const cityInput = $('#city-input');
     var calendarEl = document.getElementById('calendar');
+    let calendar; //Defined as null, to be updated with renderCalendar. Defined here so it can be accessed by other functions
 
     //----------------
     //Helper functions
     //----------------
+    
+    //List of the event types I don't want to display by default
+    const eventsOffByDefault = ['research', 'go-pass', 'go-battle-league', 'season'];
     
     //Scrapped duck API link
     const duckUrl = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json";
@@ -49,8 +53,10 @@
             start: event.start,
             end: event.end,
             url: event.link,
+            eventType: event.eventType,
+            display: eventsOffByDefault.includes(event.eventType) ? 'none' : 'auto', //turns the display off for the events I want off by default - ternary operator
         }));
-
+        console.log(calenderEvents);
         return calenderEvents;
     };
 
@@ -78,9 +84,18 @@
         const icon = current.weather[0].icon; //gives the icon code
     };
 
-    function toggleEventDisplay(){
-
+    function toggleEventDisplay(eventToRemove) {
+        var events = calendar.getEvents();
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].extendedProps.eventType === eventToRemove) { //Because eventTypes is a custom property, the calendar saves it under extendedProps
+               if (events[i].display === 'none') {
+                    events[i].setProp('display', 'auto'); //Set prop is the calendar method to change a property
+                }   else {events[i].setProp('display', 'none');
+                    }
+            }
+        }
     };
+
     //--------------
     //Main Functions
     //--------------
@@ -101,11 +116,15 @@
   
     //Calendar from FullCalendar
     function renderCalendar(events){
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             events: events,
-            themeSystem: 'bootstrap5'
-        });
+            themeSystem: 'bootstrap5',
+            eventClick: function(info) {
+            info.jsEvent.preventDefault(); // Url opens a new tab
+            if (info.event.url) {
+                window.open(info.event.url);
+        }}});
         
         calendar.render();
     };
@@ -120,7 +139,8 @@
                 .attr('id',`${event}`)
                 .on('click', () => {
                     toggleEventDisplay(event);
-                });
+                })
+                .prop('checked', eventsOffByDefault.includes(event) ? false : true);//sets the toggles to be checked or unchecked by default
             const label = $('<label>')
                 .text(event)
                 .attr('for',`${event}`);
@@ -137,6 +157,7 @@
 
         renderCalendar(events);
         renderToggleBox(uniqueEvents);
+        console.log(uniqueEvents);
     };
 
     initializeApp();
