@@ -11,7 +11,7 @@
 
 
     //-------------------
-    //Hooks into the page
+    //Hooks into the page 
     //-------------------
 
     const updateButton = $('#update-button');
@@ -19,13 +19,37 @@
     var calendarEl = document.getElementById('calendar');
     let calendar; //Defined as null, to be updated with renderCalendar. Defined here so it can be accessed by other functions
 
-    //----------------
-    //Helper functions
-    //----------------
+    //----------------------------
+    //Helper functions + constants
+    //----------------------------
     
     //List of the event types I don't want to display by default
-    const eventsOffByDefault = ['research', 'go-pass', 'go-battle-league', 'season'];
+    const eventsOffByDefault = ['research', 'go-pass', 'go-battle-league', 'season', 'pokemon-go-tour', 'city-safari'];
     
+    //Setting colours for the events. With extra colors incase new events are added in the future
+    const eventColors = {
+        'city-safari': '#f0c297',
+        'community-day': '#11d6b2',
+        'event': '#78d7ff',
+        'go-battle-league': '#1e64d5',
+        'go-pass': '#928fb8',
+        'max-battles': '#5b537d',
+        'max-mondays': '#c6d831',
+        'pokemon-go-tour': '#77b02a',
+        'pokemon-spotlight-hour': '#429058',
+        'raid-battles': '#f5a15d',
+        'raid-day': '#d46453',
+        'raid-hour': '#d66078',
+        'research': '#ff7a7d',
+        'research-day': '#ff417d',
+        'season': '#d61a88',
+        // '#cf968c'
+        // '#8f5765'
+        // '#488bd4'
+        // '#c7d4e1'
+        // '#032769'
+    };
+    console.log(eventColors);
     //Scrapped duck API link
     const duckUrl = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json";
 
@@ -54,9 +78,13 @@
             end: event.end,
             url: event.link,
             eventType: event.eventType,
-            display: eventsOffByDefault.includes(event.eventType) ? 'none' : 'auto', //turns the display off for the events I want off by default - ternary operator
+            //turns the display off for the events I want off by default - ternary operator
+            display: eventsOffByDefault.includes(event.eventType) ? 'none' : 'block', 
+            backgroundColor: eventColors[event.eventType],
+            borderColor: eventColors[event.eventType],
         }));
         console.log(calenderEvents);
+
         return calenderEvents;
     };
 
@@ -64,8 +92,8 @@
     function getUniqueEventTypes(rawEvents) {
         const eventTypes = rawEvents.map(event => event.eventType);
         const uniqueEventTypes = new Set(eventTypes);
-        const uniqueEventTypesArray = [...uniqueEventTypes];
-
+        const uniqueEventTypesUnsorted = [...uniqueEventTypes];
+        const uniqueEventTypesArray = uniqueEventTypesUnsorted.sort();
         return uniqueEventTypesArray; 
     };
    
@@ -90,7 +118,7 @@
             if (events[i].extendedProps.eventType === eventToRemove) { //Because eventTypes is a custom property, the calendar saves it under extendedProps
                if (events[i].display === 'none') {
                     events[i].setProp('display', 'auto'); //Set prop is the calendar method to change a property
-                }   else {events[i].setProp('display', 'none');
+                }   else {events[i].setProp('display', 'block');
                     }
             }
         }
@@ -120,6 +148,7 @@
             initialView: 'dayGridMonth',
             events: events,
             themeSystem: 'bootstrap5',
+            eventTextColor: 'black',
             eventClick: function(info) {
             info.jsEvent.preventDefault(); // Url opens a new tab
             if (info.event.url) {
@@ -132,6 +161,10 @@
     function renderToggleBox(uniqueEvents){
         const container = $('#toggle-box');
         container.empty();
+        const span = $('<span>')
+            .text('Choose which events to display')
+            .attr('id', 'toggle-box-title');
+        container.append(span);
         uniqueEvents.forEach(event =>{
             const toggle = $('<input>')
                 .attr('type', 'checkbox')
@@ -142,10 +175,13 @@
                 })
                 .prop('checked', eventsOffByDefault.includes(event) ? false : true);//sets the toggles to be checked or unchecked by default
             const label = $('<label>')
-                .text(event)
+                .text(event.replaceAll('-', ' '))
                 .attr('for',`${event}`);
-            container.append(toggle);
-            container.append(label);
+            const labelBoxPairDiv = $('<div>');
+            labelBoxPairDiv.addClass('toggle-box-div');
+            labelBoxPairDiv.append(label);
+            labelBoxPairDiv.append(toggle);
+            container.append(labelBoxPairDiv);
         })
     };
 
