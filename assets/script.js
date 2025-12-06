@@ -1,35 +1,27 @@
  $(() => { //jquery reads this as the same way as document.addEventListener('DOMContentLoaded', () => {
   "use strict";
    
-    //---------------
-    //API Urls & Keys 
-    //---------------
+    //==========================================================================================
+    //--------   API Urls + Keys    ---------
+    //==========================================================================================
     const apiKey = 'e26922b5bf8ae6d46c0de5695047bfd2';
     //const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${apiKey}`;
     //const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
     //const duckUrl = 'https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json';
 
 
-    //-------------------
-    //Hooks into the page 
-    //-------------------
+    //==========================================================================================
+    //--------   Hooks into page   ---------
+    //==========================================================================================
     
     const updateButton = $('#update-button');
     const cityInput = $('#city-input');
     var calendarEl = document.getElementById('calendar');
     let calendar; //Defined as null, to be updated with renderCalendar. Defined here so it can be accessed by other functions
-
-    
+   
     //==========================================================================================
-    //--------   Weather Functions    ---------
+    //--------   PoGo Event Functions    ---------
     //==========================================================================================
-    
-    
-    
-    
-    //----------------------------
-    //Helper functions + constants
-    //----------------------------
     
     //List of the event types I don't want to display by default
     const eventsOffByDefault = ['research', 'go-pass', 'go-battle-league', 'season', 'pokemon-go-tour', 'city-safari'];
@@ -79,13 +71,14 @@
         };
     };
     
-    // This maps the raw data to an array the Calender can read
-    function getScrapedDuckEvents(rawEvents) {
+    //This maps the raw data to an array the Calender can read
+    function mapRawEvents(rawEvents) {
         const calenderEvents = rawEvents.map(event =>({
             title: event.name,
             start: event.start,
             end: event.end,
             url: event.link,
+            order: 999,
             eventType: event.eventType,
             //turns the display off for the events I want off by default - ternary operator
             display: eventsOffByDefault.includes(event.eventType) ? 'none' : 'block', 
@@ -105,27 +98,25 @@
         const uniqueEventTypesArray = uniqueEventTypesUnsorted.sort();
         return uniqueEventTypesArray; 
     };
-   
-    
-    //To be called after getCoordinates has retrieved the coordinates of the city
-    async function getWeather(latitude, longitude) {
-        const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
-        try { //Let's you attempt code that might fail without crashing the entire script. 
-            const response = await fetch(weatherUrl);
-            if (!response.ok) {
-                throw new Error('Invalid response from server');
-            }
-            const data = await response.json();
-            console.log('Weather data:', data);
-            return data;
-        
-        } catch(err) {
-            alert('There was an error finding the weather.');
-            console.error(err);
-        };
+
+
+    //==========================================================================================
+    //--------   Weather Functions    ---------
+    //==========================================================================================
+    
+    //Saving the search to localstorage
+    function saveCityToHistory(city) {
+        let history = JSON.parse(localStorage.getItem('history')) || []; // [] is incase nothing exists yet
+
+        //To prevent duplicates | .some() checks if any element in the array matches the given condition
+        const normalizedCity = city.toLowerCase();
+            if (!history.some(c => c.toLowerCase() === normalizedCity)) {
+            history.push(city);
+            localStorage.setItem('history', JSON.stringify(history));
+        }
     };
-   
+    
     //gets location coordinates for getWeather
     async function getCoordinates(city){
         try { 
@@ -160,45 +151,30 @@
             console.error(err);
         }
     };
-
-    function addWeatherToCalendar(weatherEvents) {
-        weatherEvents.forEach((event) => {
-        calendar.addEvent(event)
-        });
-    };
-
-    function toggleEventDisplay(eventToRemove) {
-        var events = calendar.getEvents();
-        for (let i = 0; i < events.length; i++) {
-            if (events[i].extendedProps.eventType === eventToRemove) { //Because eventTypes is a custom property, the calendar saves it under extendedProps
-               if (events[i].display === 'none') {
-                    events[i].setProp('display', 'block'); //Set prop is the calendar method to change a property
-                }   else {events[i].setProp('display', 'none');
-                    }
-            }
-        }
-    };
-
-    //--------------
-    //Main Functions
-    //--------------
     
-    //Saving the search to localstorage
-    function saveCityToHistory(city) {
-        let history = JSON.parse(localStorage.getItem('history')) || []; // [] is incase nothing exists yet
+    //To be called after getCoordinates has retrieved the coordinates of the city
+    async function getWeather(latitude, longitude) {
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
 
-        //To prevent duplicates | .some() checks if any element in the array matches the given condition
-        const normalizedCity = city.toLowerCase();
-            if (!history.some(c => c.toLowerCase() === normalizedCity)) {
-            history.push(city);
-            localStorage.setItem('history', JSON.stringify(history));
-        }
+        try { //Let's you attempt code that might fail without crashing the entire script. 
+            const response = await fetch(weatherUrl);
+            if (!response.ok) {
+                throw new Error('Invalid response from server');
+            }
+            const data = await response.json();
+            console.log('Weather data:', data);
+            return data;
+        
+        } catch(err) {
+            alert('There was an error finding the weather.');
+            console.error(err);
+        };
     };
-
+    
     //Gets 5 day forecast in event object form so the calendar can read it
     function getWeatherEvents(weatherInfo) {
-        // These indices give roughly noon for each of the next 5 days
-        const indices = [7, 15, 23, 31, 39];
+        //These indices give current and then the next 5 days around the same time of day
+        const indices = [0, 7, 15, 23, 31, 39];
         const weatherEvents = indices.map(i => {
             const dayData = weatherInfo.list[i];
             if (!dayData) {
@@ -213,12 +189,49 @@
                 humidity: dayData.main.humidity.toFixed(0),
                 wind: (dayData.wind.speed * 3.6).toFixed(2),
                 icon: dayData.weather[0].icon,
+                //Stops the weather from going into the next day
+                allDay: true,
+                backgroundColor: '#419dbbff',
+                //Makes the weather always render last inside the day box
+                order: 0,
             };
         });
         return weatherEvents;
     };
 
-  
+    //Add weather objects to calendar
+    function addWeatherToCalendar(weatherEvents) {
+        //This clears out old weather events if someone is trying to change location
+        var events = calendar.getEvents();
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].extendedProps.eventType === 'weather') { 
+               events[i].remove();
+            }
+        };
+        weatherEvents.forEach((event) => {
+        calendar.addEvent(event)
+        });
+    };
+
+    //Toggles which PoGo events are displayed by the calendar
+    function toggleEventDisplay(eventToRemove) {
+        var events = calendar.getEvents();
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].extendedProps.eventType === eventToRemove) { //Because eventTypes is a custom property, the calendar saves it under extendedProps
+               if (events[i].display === 'none') {
+                    events[i].setProp('display', 'block'); //Set prop is the calendar method to change a property
+                }   else {events[i].setProp('display', 'none');
+                    }
+            }
+        }
+    };
+
+   
+   
+    //==========================================================================================
+    //--------   Render Functions    ---------
+    //==========================================================================================
+    
     //Calendar from FullCalendar
     function renderCalendar(events){
         calendar = new FullCalendar.Calendar(calendarEl, {
@@ -226,6 +239,23 @@
             events: events,
             themeSystem: 'bootstrap5',
             eventTextColor: 'black',
+            //Tells the calendar to use the order property I set
+            eventOrder: 'order,start,-duration,allDay,title',
+            eventContent: function(arg) {
+                if (arg.event.extendedProps.eventType === 'weather') {
+                    const weather = arg.event.extendedProps;
+                    return { html: `
+                        <div class="weather-card">
+                        <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="weather icon">
+                        <p>${weather.temp}°C</p>
+                        <p>${weather.humidity}%</p>
+                        <p>${weather.wind}km/h</p>
+                        </div>
+                    `};
+                }
+                // For regular PoGo events, render the time and title
+            return { html: `<span class="fc-event-time">${arg.timeText}</span> <span class="fc-event-title">${arg.event.title}</span>` };
+            },
             eventClick: function(info) {
             info.jsEvent.preventDefault(); // Url opens a new tab
             if (info.event.url) {
@@ -268,7 +298,7 @@
     //Feeds the api info into the render functions then calls them
     async function initializeApp() {    
         const rawEvents = await getRawEvents();        
-        const events = getScrapedDuckEvents(rawEvents);
+        const events = mapRawEvents(rawEvents);
         const uniqueEvents = getUniqueEventTypes(rawEvents);
 
         renderCalendar(events);
