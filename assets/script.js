@@ -183,7 +183,7 @@
     //Gets 5 day forecast in event object form so the calendar can read it
     function getWeatherEvents(weatherInfo) {
         //These indices give current and then the next 5 days around the same time of day
-        const indices = [7, 15, 23, 31, 39];
+        const indices = [0, 8, 16, 24, 32, 39];
         const weatherEvents = indices.map(i => {
             const dayData = weatherInfo.list[i];
             if (!dayData) {
