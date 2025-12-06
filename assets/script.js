@@ -4,12 +4,16 @@
     //==========================================================================================
     //--------   API Urls + Keys    ---------
     //==========================================================================================
+    
     const apiKey = 'e26922b5bf8ae6d46c0de5695047bfd2';
     //const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${apiKey}`;
     //const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
     //const duckUrl = 'https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json';
 
 
+    
+    
+    
     //==========================================================================================
     //--------   Hooks into page   ---------
     //==========================================================================================
@@ -18,7 +22,11 @@
     const cityInput = $('#city-input');
     var calendarEl = document.getElementById('calendar');
     let calendar; //Defined as null, to be updated with renderCalendar. Defined here so it can be accessed by other functions
-   
+    const currentCityEl = $('#current-city');
+    
+    
+    
+    
     //==========================================================================================
     //--------   PoGo Event Functions    ---------
     //==========================================================================================
@@ -101,20 +109,15 @@
 
 
 
+    
+    
     //==========================================================================================
     //--------   Weather Functions    ---------
     //==========================================================================================
     
     //Saving the search to localstorage
     function saveCityToHistory(city) {
-        let history = JSON.parse(localStorage.getItem('history')) || []; // [] is incase nothing exists yet
-
-        //To prevent duplicates | .some() checks if any element in the array matches the given condition
-        const normalizedCity = city.toLowerCase();
-            if (!history.some(c => c.toLowerCase() === normalizedCity)) {
-            history.push(city);
-            localStorage.setItem('history', JSON.stringify(history));
-        }
+        localStorage.setItem('lastCity', city);
     };
     
     //gets location coordinates for getWeather
@@ -144,7 +147,13 @@
             console.log('Lon:', longitude);
 
 
-            return {lat: latitude, lon: longitude};
+            return {
+                lat: latitude, 
+                lon: longitude,
+                name: data[0].name,
+                state: data[0].state,
+                country: data[0].country
+            };
 
         } catch (err) {
             alert('There was an error finding the city coordinates. Please try again.');
@@ -174,7 +183,7 @@
     //Gets 5 day forecast in event object form so the calendar can read it
     function getWeatherEvents(weatherInfo) {
         //These indices give current and then the next 5 days around the same time of day
-        const indices = [0, 7, 15, 23, 31, 39];
+        const indices = [7, 15, 23, 31, 39];
         const weatherEvents = indices.map(i => {
             const dayData = weatherInfo.list[i];
             if (!dayData) {
@@ -239,7 +248,9 @@
             events: events,
             themeSystem: 'bootstrap5',
             eventTextColor: 'black',
-            //Tells the calendar to use the order property I set
+            //Makes the page scroll instead of the calendar
+            height: 'auto',
+            //Tells the calendar to use the order property I set, in this order of importance
             eventOrder: 'order,start,-duration,allDay,title',
             eventContent: function(arg) {
                 if (arg.event.extendedProps.eventType === 'weather') {
@@ -253,7 +264,7 @@
                         </div>
                     `};
                 }
-                // For regular PoGo events, render the time and title
+            // For regular PoGo events, render the time and title
             return { html: `<span class="fc-event-time">${arg.timeText}</span> <span class="fc-event-title">${arg.event.title}</span>` };
             },
             eventClick: function(info) {
@@ -304,13 +315,28 @@
         renderCalendar(events);
         renderToggleBox(uniqueEvents);
         console.log(uniqueEvents);
+
+        const lastCity = localStorage.getItem('lastCity');
+
+        if (lastCity) {
+        const coordinates = await getCoordinates(lastCity);
+        const weather = await getWeather(coordinates.lat, coordinates.lon);
+        const weatherEvents = getWeatherEvents(weather);
+        addWeatherToCalendar(weatherEvents);
+        
+        //Ternary operator to make the display work even if there is no state given
+        const locationText = coordinates.state 
+        ? `${coordinates.name}, ${coordinates.state}, ${coordinates.country}`
+        : `${coordinates.name}, ${coordinates.country}`;
+        currentCityEl.text(locationText);
+        }
     };
 
     initializeApp();
 
-    //---------------
-    //Event listeners
-    //---------------
+    //==========================================================================================
+    //--------   Event Listeners    ---------
+    //==========================================================================================
 
     updateButton.on('click', async () => {
         const city = cityInput.val().trim();
@@ -319,11 +345,48 @@
         if (city === '') {
             return; //Prevents searching if search is empty
         }
-        saveCityToHistory(city);
 
         const coordinates = await getCoordinates(city);
         const weather = await getWeather(coordinates.lat, coordinates.lon);
         const weatherEvents = getWeatherEvents(weather);
         addWeatherToCalendar(weatherEvents);
+        saveCityToHistory(coordinates.name);
+        
+        //Ternary operatory to make the display work even if there is no state given
+        const locationText = coordinates.state 
+        ? `${coordinates.name}, ${coordinates.state}, ${coordinates.country}`
+        : `${coordinates.name}, ${coordinates.country}`;
+        currentCityEl.text(locationText);
+    });
+
+    cityInput.on('keypress', async (event) => {
+        if (event.key !== "Enter") {
+            return; //Prevents activation from other keys
+        }
+        event.preventDefault(); //Prevents page reload
+        const city = cityInput.val().trim();
+        console.log(city);
+        cityInput.val('');
+        if (city === '') {
+            return; //Prevents searching if search is empty
+        }
+
+        const coordinates = await getCoordinates(city);
+        const weather = await getWeather(coordinates.lat, coordinates.lon);
+        const weatherEvents = getWeatherEvents(weather);
+        addWeatherToCalendar(weatherEvents);
+        saveCityToHistory(coordinates.name);
+        
+        //Ternary operatory to make the display work even if there is no state given
+        const locationText = coordinates.state 
+         ? `${coordinates.name}, ${coordinates.state}, ${coordinates.country}`
+         : `${coordinates.name}, ${coordinates.country}`;
+        currentCityEl.text(locationText);
+    });
+
+    // Navbar burger toggle for mobile
+    $('.navbar-burger').on('click', function() {
+        $('.navbar-burger').toggleClass('is-active');
+        $('.navbar-menu').toggleClass('is-active');
     });
 });

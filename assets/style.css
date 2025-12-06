@@ -1,8 +1,21 @@
-/* Note to self - rem means root element, so size is using that as a reference. Makes it easier to keep things consistent
+/* ====================================================
+   PoGo Event Calendar - Stylesheet
+   ====================================================
+   Table of Contents:
+   1. CSS Reset + Base Styles
+   2. Header + Navbar (Bulma Overrides)
+   3. Main Layout
+   4. Toggle Box Sidebar
+   5. Calendar Styling
+   6. FullCalendar Overrides
+   7. Weather Cards
+   8. Footer
+   9. Responsive Design
+   ==================================================== */
 
-/* =======================
-   CSS Reset + Base Styles
-   ======================= */
+/* ====================================================
+   1. CSS Reset + Base Styles
+   ==================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -16,57 +29,70 @@ body {
     color: #ffffff;
 }
 
-/* ===============
-   Header + Navbar
-   =============== */
+/* ====================================================
+   2. Header + Navbar (Bulma Overrides)
+   ==================================================== */
 header {
     background: linear-gradient(90deg, #1a237e 0%, #0d47a1 100%);
-    padding: 1rem 2rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
+    background: transparent;
+    max-width: 1400px;
     margin: 0 auto;
+    justify-content: space-between;
 }
 
-.navbar-links {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-}
-
-.navbar-links a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.navbar-links a:hover {
-    background: rgba(255, 255, 255, 0.15);
+.navbar-brand strong {
     color: #ffca28;
+    font-size: 1.25rem;
 }
 
-/* ==============
-   Search Section
-   ============== */
-#search-section {
-    display: flex;
-    gap: 0.5rem;
+.navbar-item {
+    color: #ffffff;
+}
+
+/* .navbar-item:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffca28 !important;
+} */
+
+.navbar-burger {
+    color: #ffffff;
+}
+
+.navbar-burger:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.navbar-start,
+.navbar-center,
+.navbar-end {
+    align-items: center !important;
+}
+
+.navbar-center .navbar-item {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#current-city-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#current-city {
+    color: #ffca28;
+    font-weight: 700;
+    text-transform: capitalize;
 }
 
 #city-input {
     padding: 0.75rem 1rem;
     border: 2px solid transparent;
-    border-radius: 25px;
+    border-radius: 25px 0 0 25px;
     font-size: 1rem;
-    width: 250px;
+    width: 200px;
     background: rgba(255, 255, 255, 0.95);
     color: #1a1a2e;
     transition: all 0.3s ease;
@@ -75,7 +101,7 @@ header {
 #city-input:focus {
     outline: none;
     border-color: #ffca28;
-    box-shadow: 0 0 15px rgba(255, 202, 40, 0.4);
+    box-shadow: 0 0 10px rgba(255, 202, 40, 0.3);
 }
 
 #city-input::placeholder {
@@ -87,7 +113,7 @@ header {
     background: linear-gradient(135deg, #ffca28 0%, #ff9800 100%);
     color: #1a1a2e;
     border: none;
-    border-radius: 25px;
+    border-radius: 0 25px 25px 0;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -95,45 +121,92 @@ header {
 }
 
 #update-button:hover {
-    transform: translateY(-2px); /* Give the button that lift appearance when you hover over it*/
-    box-shadow: 0 6px 20px rgba(255, 202, 40, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 202, 40, 0.4);
 }
 
 #update-button:active {
     transform: translateY(0);
 }
 
-/* ========================
-   Main Layout
-   ======================== */
-#layout-container {
-    max-width: 1800px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-}
-
-/* ========================
-   Calendar Title Section
-   ======================== */
+/* ====================================================
+   3. Main Layout
+   ==================================================== */
 #calendar-title {
     text-align: center;
     margin-bottom: 2rem;
 }
 
-#current-city-label {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.8);
+#layout-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 2rem;
 }
 
-#current-city {
+/* ====================================================
+   4. Toggle Box Sidebar
+   ==================================================== */
+#toggle-box {
+    background: linear-gradient(180deg, #1a237e 0%, #0d1b4a 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    min-width: 220px;
+    max-width: 260px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: fit-content;
+    border: 2px solid rgba(255, 202, 40, 0.3);
+}
+
+#toggle-box-title {
     color: #ffca28;
+    font-size: 1.1rem;
     font-weight: 700;
-    font-size: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(255, 202, 40, 0.3);
 }
 
-/* ================
-   Calendar Styling
-   ================*/
+.toggle-box-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.toggle-box-div:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#toggle-box label {
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+
+#toggle-box input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ffca28;
+}
+
+/* ====================================================
+   5. Calendar Styling
+   ==================================================== */
 #calendar {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 16px;
@@ -142,14 +215,11 @@ header {
     flex: 1;
 }
 
-/* FullCalendar Overrides */
+/* ====================================================
+   6. FullCalendar Overrides
+   ==================================================== */
 .fc {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* To force the event blocks to not cut off the time part of the display */
-.fc-event-time {
-    flex-shrink:0;
 }
 
 .fc-toolbar-title {
@@ -208,91 +278,26 @@ header {
     border: none !important;
     padding: 2px 6px !important;
     font-size: 0.85rem !important;
+    overflow: hidden;
 }
 
-/* Overwritten by event specific colors, but left to refer back to just incase */
-/* .fc-daygrid-event {
-    background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%) !important;
-} */
+.fc-event-time {
+    flex-shrink: 0;
+}
+
+.fc-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 .fc-daygrid-event:hover {
     background: linear-gradient(135deg, #f06292 0%, #e91e63 100%) !important;
 }
 
-/* ==========================
-   Layout - Sidebar + Calendar
-   ========================== */
-#layout-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-    display: flex;
-    gap: 2rem;
-}
-
-/* ========================
-   Toggle Box Sidebar
-   ======================== */
-#toggle-box {
-    background: linear-gradient(180deg, #1a237e 0%, #0d1b4a 100%);
-    border-radius: 16px;
-    padding: 1.5rem;
-    min-width: 220px;
-    max-width: 260px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    height: fit-content;
-    border: 2px solid rgba(255, 202, 40, 0.3);
-}
-
-#toggle-box-title {
-    color: #ffca28;
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid rgba(255, 202, 40, 0.3);
-}
-
-.toggle-box-div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease;
-}
-
-.toggle-box-div:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-#toggle-box label {
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-transform: capitalize;
-}
-
-#toggle-box input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #ffca28;
-}
-
-/* =============================
-   Weather cards inside calendar
-   ============================= */
-
+/* ====================================================
+   7. Weather Cards
+   ==================================================== */
 .weather-card {
     display: flex;
     flex-direction: column;
@@ -300,6 +305,8 @@ header {
     font-size: 0.7rem;
     padding: 2px;
     line-height: 1.2;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .weather-card img {
@@ -311,17 +318,141 @@ header {
     margin: 0;
 }
 
-.fc-event {
-    overflow: hidden;
+/* ====================================================
+   8. Footer
+   ==================================================== */
+#site-footer {
+    background: linear-gradient(90deg, #1a237e 0%, #0d47a1 100%);
+    padding: 2rem;
+    margin-top: 2rem;
 }
 
-.fc-event-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.weather-card {
-    overflow: hidden;
-    white-space: nowrap;
+.footer-top {
+    display: flex;
+    justify-content: center;
+    gap: 6rem;
+    margin-bottom: 2rem;
+}
+
+.footer-contact,
+.footer-credits {
+    text-align: left;
+}
+
+.footer-contact h4,
+.footer-credits h4 {
+    color: #ffca28;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+}
+
+.footer-contact p,
+.footer-credits p {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#site-footer a {
+    color: #ffca28;
+    text-decoration: none;
+}
+
+#site-footer a:hover {
+    text-decoration: underline;
+}
+
+.disclaimer {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 800px;
+    margin: 0 auto 1rem auto;
+    text-align: center;
+}
+
+.license {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ====================================================
+   9. Responsive Design
+   ==================================================== */
+@media (max-width: 1023px) {
+    .navbar-menu {
+        background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+        padding: 1rem;
+    }
+    
+    .navbar-menu.is-active {
+        display: block;
+    }
+
+    #layout-container {
+        flex-direction: column;
+    }
+
+    #toggle-box {
+        max-width: 100%;
+        min-width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #toggle-box-title {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .toggle-box-div {
+        width: auto;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        background: rgba(26, 35, 126, 0.1);
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    #layout-container {
+        padding: 0 1rem;
+    }
+
+    #calendar {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    #calendar-title {
+        padding: 0 1rem;
+    }
+
+    .footer-top {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .footer-contact,
+    .footer-credits {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    #city-input {
+        width: 150px;
+    }
+
+    .toggle-box-div {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
