@@ -17,6 +17,8 @@ helped me connect external data sources to a clean, interactive user experience.
 
 -Visit "https://bearsanity.github.io/PoGo-Event-Calendar/"
 
+#Note for mobile users, I recommend turning your screen sideways when viewing the app. It will make for a much better experience.
+
 <img width="848" height="637" alt="Screenshot 2025-12-06 at 4 10 40 AM" src="https://github.com/user-attachments/assets/437b35af-7197-4ef8-a11d-11c719b348e2" />
 
 -Clicking on an event will open the relevant Leek Duck page for the event
